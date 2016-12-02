@@ -6,22 +6,30 @@ import rootReducer from './reducers';
 import {makeHTTPDriver} from '@cycle/http';
 
 import { createCycleMiddleware } from './createCycleMiddleware';
-import { receiveUserRepos } from '../actions';
-import * as ActionTypes from '../ActionTypes';
+import { receiveUserRepos } from './actions';
+import * as ActionTypes from './ActionTypes';
+
+import xs from 'xstream';
 
 function main(sources) {
-  const request$ = sources.ACTION
+  const user$ = sources.ACTION
+    .debug(action => console.log(action))
     .filter(action => action.type === ActionTypes.REQUESTED_USER_REPOS)
-    .map(action => action.payload.user)
-    .map(user => {
+    .map(action => action.payload.user);
+
+  const request$ = user$
+    .map(user => ({
       url: `https://api.github.com/users/${user}/repos`,
       category: 'users'
-    })
+    }));
 
-  const action$ = sources.HTTP
+  const response$ = sources.HTTP
     .select('users')
-    .flatten()
-    .map(receiveUserRepos.bind(null, user))
+    .flatten();
+
+  const action$ = xs.combine(response$, user$)
+    .map(args => console.log(arguments))
+    // .map(receiveUserRepos.bind(null, user))
 
   return {
     ACTION: action$,
