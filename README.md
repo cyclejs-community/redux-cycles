@@ -1,6 +1,6 @@
 Handle redux async actions using Cycle.js. 
 
-```
+```js
 // Here's how Async is done using redux-observable.
 // The problem is that we still have side-effects in our epics (ajax.getJSON)
 const fetchUserEpic = action$ =>
