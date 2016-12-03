@@ -10,10 +10,11 @@ import { receiveUserRepos } from './actions';
 import * as ActionTypes from './ActionTypes';
 
 import xs from 'xstream';
+import debounce from 'xstream/extra/debounce';
 
 function main(sources) {
   const user$ = sources.ACTION
-    .debug(action => console.log(action))
+    // .debug(action => console.log(action))
     .filter(action => action.type === ActionTypes.REQUESTED_USER_REPOS)
     .map(action => action.payload.user);
 
@@ -27,13 +28,36 @@ function main(sources) {
     .select('users')
     .flatten();
 
-  const action$ = xs.combine(response$, user$)
-    .map(args => console.log(arguments))
+  const action$ = xs.combine(response$)
+    .map(args => console.log(arguments));
     // .map(receiveUserRepos.bind(null, user))
 
+  const searchQuery$ = sources.ACTION
+    .filter(action => action.type === ActionTypes.SEARCHED_USERS)
+    .map(action => action.payload.query)
+    .filter(q => !!q)
+    .compose(debounce(800))
+    .endWhen(
+      sources.ACTION.filter(action =>
+        action.type === ActionTypes.CLEARED_SEARCH_RESULTS)
+    )
+
+  const searchQueryRequest$ = searchQuery$
+    .map(q => ({
+      url: `https://api.github.com/search/users?q=${q}`,
+      category: 'query'
+    }))
+
+  const searchQueryResponse$ = sources.HTTP
+    .select('query')
+    .flatten()
+    .map(res => res.items)
+    .debug(items => console.log(items))
+    // .map(receiveUsers)
+
   return {
-    ACTION: action$,
-    HTTP: request$
+    HTTP: xs.merge(request$, searchQueryRequest$),
+    ACTION: xs.of({ type: 'foo' }),
   };
 }
 
