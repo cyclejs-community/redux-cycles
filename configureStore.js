@@ -6,7 +6,7 @@ import rootReducer from './reducers';
 import {makeHTTPDriver} from '@cycle/http';
 
 import { createCycleMiddleware } from './createCycleMiddleware';
-import { receiveUserRepos } from './actions';
+import * as actions from './actions';
 import * as ActionTypes from './ActionTypes';
 
 import xs from 'xstream';
@@ -14,7 +14,6 @@ import debounce from 'xstream/extra/debounce';
 
 function main(sources) {
   const user$ = sources.ACTION
-    // .debug(action => console.log(action))
     .filter(action => action.type === ActionTypes.REQUESTED_USER_REPOS)
     .map(action => action.payload.user);
 
@@ -28,19 +27,18 @@ function main(sources) {
     .select('users')
     .flatten();
 
-  const action$ = xs.combine(response$)
-    .map(args => console.log(arguments));
-    // .map(receiveUserRepos.bind(null, user))
+  const action$ = xs.combine(response$, user$)
+    .map(arr => actions.receiveUserRepos(arr[1], arr[0].body));
 
   const searchQuery$ = sources.ACTION
     .filter(action => action.type === ActionTypes.SEARCHED_USERS)
     .map(action => action.payload.query)
     .filter(q => !!q)
     .compose(debounce(800))
-    .endWhen(
-      sources.ACTION.filter(action =>
-        action.type === ActionTypes.CLEARED_SEARCH_RESULTS)
-    )
+    // .endWhen(
+    //   sources.ACTION.filter(action =>
+    //     action.type === ActionTypes.CLEARED_SEARCH_RESULTS)
+    // )
 
   const searchQueryRequest$ = searchQuery$
     .map(q => ({
@@ -51,13 +49,17 @@ function main(sources) {
   const searchQueryResponse$ = sources.HTTP
     .select('query')
     .flatten()
-    .map(res => res.items)
-    .debug(items => console.log(items))
-    // .map(receiveUsers)
+    .map(res => res.body.items)
+    .map(actions.receiveUsers)
+
+  const clear$ = sources.ACTION
+    .filter(action => action.type === ActionTypes.SEARCHED_USERS)
+    .filter(action => !!!action.payload.query)
+    .map(actions.clearSearchResults);
 
   return {
     HTTP: xs.merge(request$, searchQueryRequest$),
-    ACTION: xs.of({ type: 'foo' }),
+    ACTION: xs.merge(searchQueryResponse$, clear$, action$),
   };
 }
 
