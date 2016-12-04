@@ -1,4 +1,4 @@
-Handle redux async actions using Cycle.js. 
+Handle redux async actions using Cycle.js.
 
 ```js
 // Here's how Async is done using redux-observable.
@@ -16,11 +16,11 @@ function main(sources) {
   let request$ = sources.ACTION.ofType(FETCH_USER)
     .map(action => {
       url: `https://api.github.com/users/${action.payload}`,
-      category: 'hello',
+      category: 'users',
     });
 
   let action$ = sources.HTTP
-    .select('hello')
+    .select('users')
     .flatten()
     .map(fetchUserFulfilled);
 
@@ -31,7 +31,9 @@ function main(sources) {
 }
 ```
 
-This allows to build redux apps entirely without side effects, since they are handled by Cycle.js drivers. 
+This allows to build redux apps entirely without side effects, as they are handled by Cycle.js drivers.
+
+To see an example, checkout the `cycle` folder for a more complex autocomplete app. And to use it run:
 
 ```
 npm install
