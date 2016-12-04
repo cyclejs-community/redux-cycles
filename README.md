@@ -11,7 +11,6 @@ const fetchUserEpic = action$ =>
     );
 
 // With Cycle.js we can push them even further outside our app using drivers.
-// sources.ACTION is the same action stream used in "epics"
 function main(sources) {  
   let request$ = sources.ACTION.ofType(FETCH_USER)
     .map(action => {
@@ -31,9 +30,9 @@ function main(sources) {
 }
 ```
 
-This allows to build redux apps entirely without side effects, as they are handled by Cycle.js drivers.
+See a real world example [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/cycle/index.js).
 
-To see an example, checkout the `cycle` folder for a more complex autocomplete app. And to use it run:
+This middleware intercepts Redux actions and allows us to handle them using Cycle.js in a pure dataflow manner, without side effects.
 
 ```
 npm install
