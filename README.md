@@ -1,5 +1,7 @@
 Handle redux async actions using Cycle.js.
 
+`npm install redux-cycle-middleware`
+
 Here's how Async is done using [redux-observable](https://github.com/redux-observable/redux-observable). The problem is that we still have side-effects in our epics (`ajax.getJSON`). This means that we're still writing imperative code:
 
 ```js
