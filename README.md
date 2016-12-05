@@ -2,6 +2,29 @@ Handle redux async actions using Cycle.js.
 
 `npm install redux-cycle-middleware`
 
+Then use `createCycleMiddleware()` which takes as first argument your `main` Cycle.js function, and second argument the Cycle.js drivers you want to use:
+
+```js
+import { createCycleMiddleware } from 'redux-cycle-middleware';
+
+function main(sources) {  
+  const pong$ = sources.ACTION
+    .filter(action => action.type === 'PING')
+    .mapTo({ type: 'PONG' });
+
+  return {
+    ACTION: pong$
+  }
+}
+
+const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
+
+const store = createStore(
+  rootReducer,
+  applyMiddleware(cycleMiddleware)
+);
+```
+
 Here's how Async is done using [redux-observable](https://github.com/redux-observable/redux-observable). The problem is that we still have side-effects in our epics (`ajax.getJSON`). This means that we're still writing imperative code:
 
 ```js
@@ -35,6 +58,6 @@ function main(sources) {
 }
 ```
 
-See a real world example: [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/cycle/index.js).
+See a real world example: [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
 
 This middleware intercepts Redux actions and allows us to handle them using Cycle.js in a pure data-flow manner, without side effects. It was heavily inspired by [redux-observable](https://github.com/redux-observable/redux-observable), but instead of `epics` there's an `ACTION` driver observable with the same actions-in, actions-out concept. The main difference is that you can handle them inside the Cycle.js loop and therefore take advantage of the power of Cycle.js functional reactive programming paradigms.
