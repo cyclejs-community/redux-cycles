@@ -1,7 +1,7 @@
 {
-  "name": "redux-observable-navigation-example",
-  "version": "0.0.0",
-  "description": "redux-observable navigation example",
+  "name": "redux-cycle-middleware",
+  "version": "0.0.1",
+  "description": "Bring functional reactive programming to Redux using Cycle.js",
   "main": "index.js",
   "scripts": {
     "serve": "webpack-dev-server --inline --history-api-fallback",
