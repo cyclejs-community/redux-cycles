@@ -36,8 +36,3 @@ function main(sources) {
 See a real world example: [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/cycle/index.js).
 
 This middleware intercepts Redux actions and allows us to handle them using Cycle.js in a pure data-flow manner, without side effects. It was heavily inspired by [redux-observable](https://github.com/redux-observable/redux-observable), but instead of `epics` there's an `ACTION` driver observable with the same actions-in, actions-out concept. The main difference is that you can handle them inside the Cycle.js loop and therefore take advantage of the power of Cycle.js functional reactive programming paradigms.
-
-```
-npm install
-npm run serve
-```
