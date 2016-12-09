@@ -70,7 +70,7 @@ This middleware intercepts Redux actions and allows us to handle them using Cycl
 
 ## Why not just use Cycle.js?
 
-Mainly becaue Cycle.js does not say anything about how to handle state, so using something like Redux, which has specific rules for state management, is something that can be tied with Cycle.js. This middleware allows you to continue using your  Redux/React stack, while allowing you to get your hands wet with FRP and Cycle.js.
+Mainly because Cycle.js does not say anything about how to handle state, so Redux, which has specific rules for state management, is something that can be used along with Cycle.js. This middleware allows you to continue using your Redux/React stack, while allowing you to get your hands wet with FRP and Cycle.js.
 
 ## What's the difference between "adding Redux to Cycle.js" and "adding Cycle.js to Redux"?
 
