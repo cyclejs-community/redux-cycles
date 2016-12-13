@@ -1,8 +1,8 @@
-Handle redux async actions using Cycle.js.
+Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 
 # Install
 
-`npm install redux-cycle-middleware`
+`npm install --save redux-cycle-middleware`
 
 Then use `createCycleMiddleware()` which takes as first argument your `main` Cycle.js function, and second argument the Cycle.js drivers you want to use:
 
@@ -48,7 +48,8 @@ With Cycle.js we can push them even further outside our app using drivers, allow
 
 ```js
 function main(sources) {
-  const request$ = sources.ACTION.ofType(FETCH_USER)
+  const request$ = sources.ACTION
+    .filter(action => action.type === FETCH_USER)
     .map(action => {
       url: `https://api.github.com/users/${action.payload}`,
       category: 'users',
@@ -82,13 +83,13 @@ function main(sources) {
   const state$ = sources.STATE;
   const isOdd$ = state$.map(state => state.counter % 2 === 0);
   const increment$ = sources.ACTION
-    .filter(action => action.type === INCREMENT_IF_ODD);
+    .filter(action => action.type === INCREMENT_IF_ODD)
     .compose(sampleCombine(isOdd$))
     .map(([ action, isOdd ]) => isOdd ? increment() : null)
     .filter(action => action);
 
   return {
-    ACTION: increment$,
+    ACTION: increment$
   };
 }
 ```
@@ -99,6 +100,6 @@ Mainly because Cycle.js does not say anything about how to handle state, so Redu
 
 ## What's the difference between "adding Redux to Cycle.js" and "adding Cycle.js to Redux"?
 
-This middleware doesn't mix Cycle.js with Redux/React at all (like other cycle-redux middlewares do). It behaves completely separate and it's meant to (i) intercept actions, (ii) react upon them functionally and purely, and (iii) dispatch new actions. So you can build your whole app without this middleware, then once you're ready to do async stuff, you can plug it in to handle your async stuff with Cycle.
+This middleware doesn't mix Cycle.js with Redux/React at all (like other cycle-redux middlewares do). It behaves completely separately and it's meant to (i) intercept actions, (ii) react upon them functionally and purely, and (iii) dispatch new actions. So you can build your whole app without this middleware, then once you're ready to do async stuff, you can plug it in to handle your async stuff with Cycle.
 
 Also you should think of this middleware as a different option to handle side-effects in React/Redux apps. Currently there's redux-saga (which uses generators) and redux-observable (as I mentioned in the README of the project). However, they're both imperative (non-pure) ways of doing async. This middleware is a way of handling your side effects in a pure way using Cycle.js.
