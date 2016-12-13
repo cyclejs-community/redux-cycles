@@ -9,7 +9,7 @@ Then use `createCycleMiddleware()` which takes as first argument your `main` Cyc
 ```js
 import { createCycleMiddleware } from 'redux-cycle-middleware';
 
-function main(sources) {  
+function main(sources) {
   const pong$ = sources.ACTION
     .filter(action => action.type === 'PING')
     .mapTo({ type: 'PONG' });
@@ -47,7 +47,7 @@ const fetchUserEpic = action$ =>
 With Cycle.js we can push them even further outside our app using drivers, allowing us to write entirely declarative code:
 
 ```js
-function main(sources) {  
+function main(sources) {
   const request$ = sources.ACTION.ofType(FETCH_USER)
     .map(action => {
       url: `https://api.github.com/users/${action.payload}`,
@@ -67,6 +67,31 @@ function main(sources) {
 ```
 
 This middleware intercepts Redux actions and allows us to handle them using Cycle.js in a pure data-flow manner, without side effects. It was heavily inspired by [redux-observable](https://github.com/redux-observable/redux-observable), but instead of `epics` there's an `ACTION` driver observable with the same actions-in, actions-out concept. The main difference is that you can handle them inside the Cycle.js loop and therefore take advantage of the power of Cycle.js functional reactive programming paradigms.
+
+## Drivers
+
+Redux-cycle-middleware ships with two drivers:
+
+* `ACTION`, which is a read-write driver, allowing to react to actions that have just happened, as well as to dispatch new actions.
+* `STATE`, which is a read-only driver that streams the current state. It's a reactive counterpart of the `yield select(state => state)` effect in Redux-saga.
+
+```javascript
+import sampleCombine from 'xstream/extra/sampleCombine'
+
+function main(sources) {
+  const state$ = sources.STATE;
+  const isOdd$ = state$.map(state => state.counter % 2 === 0);
+  const increment$ = sources.ACTION
+    .filter(action => action.type === INCREMENT_IF_ODD);
+    .compose(sampleCombine(isOdd$))
+    .map(([ action, isOdd ]) => isOdd ? increment() : null)
+    .filter(action => action);
+
+  return {
+    ACTION: increment$,
+  };
+}
+```
 
 ## Why not just use Cycle.js?
 
