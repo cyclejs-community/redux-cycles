@@ -1,10 +1,9 @@
 import { createStore, applyMiddleware, compose } from 'redux';
-import { createEpicMiddleware } from 'redux-observable';
 import { browserHistory } from 'react-router';
 import { routerMiddleware } from 'react-router-redux';
 import rootReducer from './reducers';
 import main from './cycle';
-import { createCycleMiddleware } from '../src';
+import { createCycleMiddleware } from 'redux-cycle-middleware';
 import {makeHTTPDriver} from '@cycle/http';
 
 const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
