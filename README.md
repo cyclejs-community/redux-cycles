@@ -29,6 +29,8 @@ const store = createStore(
 
 # Example
 
+Try out this [JS Bin](https://jsbin.com/govola/10/edit?js,output).
+
 See a real world example: [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
 
 # What is this?
