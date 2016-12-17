@@ -76,7 +76,7 @@ This middleware intercepts Redux actions and allows us to handle them using Cycl
 Redux-cycle-middleware ships with two drivers:
 
 * `ACTION`, which is a read-write driver, allowing to react to actions that have just happened, as well as to dispatch new actions.
-* `STATE`, which is a read-only driver that streams the current state. It's a reactive counterpart of the `yield select(state => state)` effect in Redux-saga.
+* `STATE`, which is a read-only driver that streams the current redux state. It's a reactive counterpart of the `yield select(state => state)` effect in Redux-saga.
 
 ```javascript
 import sampleCombine from 'xstream/extra/sampleCombine'
@@ -95,6 +95,8 @@ function main(sources) {
   };
 }
 ```
+
+Here's an example on [how the STATE driver works](https://jsbin.com/kijucaw/7/edit?js,output).
 
 ## Why not just use Cycle.js?
 
