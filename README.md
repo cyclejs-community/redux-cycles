@@ -98,6 +98,31 @@ function main(sources) {
 
 Here's an example on [how the STATE driver works](https://jsbin.com/kijucaw/7/edit?js,output).
 
+## Utils
+
+Redux-cycle-middleware ships with a combineCycles util. As the name suggests, it allows you to take multiple cycle apps (main functions) and combine them into a single one.
+
+### Example
+
+```javascript
+import { combineCycles } from 'redux-cycle-middleware';
+
+// import all your cycle apps (main functions) you intend to use with the middleware:
+import fetchReposByUser from './fetchReposByUser';
+import searchUsers from './searchUsers';
+import clearSearchResults from './clearSearchResults';
+
+export default combineCycles(
+  fetchReposByUser,
+  searchUsers,
+  clearSearchResults
+);
+
+```
+
+You can see it used in the provided [example](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
+
+
 ## Why not just use Cycle.js?
 
 Mainly because Cycle.js does not say anything about how to handle state, so Redux, which has specific rules for state management, is something that can be used along with Cycle.js. This middleware allows you to continue using your Redux/React stack, while allowing you to get your hands wet with FRP and Cycle.js.
