@@ -1,6 +1,7 @@
 import * as actions from '../actions';
 import * as ActionTypes from '../ActionTypes';
 
+import { combineCycles } from 'redux-cycle-middleware';
 import xs from 'xstream';
 
 function fetchReposByUser(sources) {
@@ -61,17 +62,15 @@ function searchUsers(sources) {
   }
 }
 
-export default function main(sources) {
-  const _fetchReposByUser = fetchReposByUser(sources);
-  const _searchUsers = searchUsers(sources);
-
+function clearSearchResults(sources) {
   const clear$ = sources.ACTION
     .filter(action => action.type === ActionTypes.SEARCHED_USERS)
     .filter(action => !!!action.payload.query)
     .map(actions.clearSearchResults);
 
   return {
-    HTTP: xs.merge(_fetchReposByUser.HTTP, _searchUsers.HTTP),
-    ACTION: xs.merge(_fetchReposByUser.ACTION, _searchUsers.ACTION, clear$),
-  };
+    ACTION: clear$
+  }
 }
+
+export default combineCycles(fetchReposByUser, searchUsers, clearSearchResults);
