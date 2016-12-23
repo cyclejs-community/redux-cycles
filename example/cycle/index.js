@@ -4,7 +4,7 @@ import * as ActionTypes from '../ActionTypes';
 import { combineCycles } from 'redux-cycle-middleware';
 import xs from 'xstream';
 
-function fetchReposByUser(sources) {
+export function fetchReposByUser(sources) {
   const user$ = sources.ACTION
     .filter(action => action.type === ActionTypes.REQUESTED_USER_REPOS)
     .map(action => action.payload.user);
