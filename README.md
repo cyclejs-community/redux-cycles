@@ -122,12 +122,15 @@ export default combineCycles(
 
 You can see it used in the provided [example](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
 
+## Testing
+
+Since your main Cycle functions are pure dataflow, you can test them quite easily by giving streams as input and expecting specific streams as outputs. Checkout [these example tests](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/test/test.js). Also checkout the [cyclejs/time](https://github.com/cyclejs/time) project, which should work perfectly with redux-cycle-middleware.
 
 ## Why not just use Cycle.js?
 
 Mainly because Cycle.js does not say anything about how to handle state, so Redux, which has specific rules for state management, is something that can be used along with Cycle.js. This middleware allows you to continue using your Redux/React stack, while allowing you to get your hands wet with FRP and Cycle.js.
 
-## What's the difference between "adding Redux to Cycle.js" and "adding Cycle.js to Redux"?
+### What's the difference between "adding Redux to Cycle.js" and "adding Cycle.js to Redux"?
 
 This middleware doesn't mix Cycle.js with Redux/React at all (like other cycle-redux middlewares do). It behaves completely separately and it's meant to (i) intercept actions, (ii) react upon them functionally and purely, and (iii) dispatch new actions. So you can build your whole app without this middleware, then once you're ready to do async stuff, you can plug it in to handle your async stuff with Cycle.
 
