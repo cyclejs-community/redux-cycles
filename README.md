@@ -52,10 +52,10 @@ With Cycle.js we can push them even further outside our app using drivers, allow
 function main(sources) {
   const request$ = sources.ACTION
     .filter(action => action.type === FETCH_USER)
-    .map(action => {
+    .map(action => ({
       url: `https://api.github.com/users/${action.payload}`,
       category: 'users',
-    });
+    }));
 
   const action$ = sources.HTTP
     .select('users')
@@ -134,4 +134,4 @@ Mainly because Cycle.js does not say anything about how to handle state, so Redu
 
 This middleware doesn't mix Cycle.js with Redux/React at all (like other cycle-redux middlewares do). It behaves completely separately and it's meant to (i) intercept actions, (ii) react upon them functionally and purely, and (iii) dispatch new actions. So you can build your whole app without this middleware, then once you're ready to do async stuff, you can plug it in to handle your async stuff with Cycle.
 
-Also you should think of this middleware as a different option to handle side-effects in React/Redux apps. Currently there's redux-saga (which uses generators) and redux-observable (as I mentioned in the README of the project). However, they're both imperative (non-pure) ways of doing async. This middleware is a way of handling your side effects in a pure way using Cycle.js.
+You should think of this middleware as a different option to handle side-effects in React/Redux apps. Currently there's redux-observable and redux-saga (which uses generators). However, they're both imperative and non-reactive ways of doing async. This middleware is a way of handling your side effects in a pure and reactive way using Cycle.js.
