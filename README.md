@@ -1,6 +1,9 @@
+# Redux-cycle-middleware
 Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 
-# Install
+[![Build Status](https://travis-ci.org/cyclejs-community/redux-cycle-middleware.svg?branch=master)](https://travis-ci.org/cyclejs-community/redux-cycle-middleware)
+
+## Install
 
 `npm install --save redux-cycle-middleware`
 
@@ -27,13 +30,13 @@ const store = createStore(
 );
 ```
 
-# Example
+## Example
 
 Try out this [JS Bin](https://jsbin.com/govola/10/edit?js,output).
 
 See a real world example: [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
 
-# What is this?
+## What is this?
 
 Here's how Async is done using [redux-observable](https://github.com/redux-observable/redux-observable). The problem is that we still have side-effects in our epics (`ajax.getJSON`). This means that we're still writing imperative code:
 
