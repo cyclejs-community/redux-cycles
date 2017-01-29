@@ -1,7 +1,7 @@
 import { createCycleMiddleware } from '../';
 import { createStore, applyMiddleware } from 'redux';
-import expect from 'expect'
 import xs from 'xstream';
+jest.useFakeTimers();
 
 function initStore(main, drivers, reducer = null) {
   const rootReducer = reducer || ((state = [], action) => state.concat(action));
@@ -34,17 +34,17 @@ describe('Redux cycle middleware', () => {
 
     store.dispatch({ type: 'PING' })
 
-    expect(store.getState()).toEqual(expectedActions)
+    expect(store.getState()).toMatchObject(expectedActions)
 
     done();
   })
 
-  it('dispatches a PING to see whether the middleware dispatches a PONG after 10 milliseconds', (done) => {
+  it('dispatches a PING to see whether the middleware dispatches a PONG after 10 seconds', (done) => {
     function main(sources) {
       const pong$ = sources.ACTION
         .filter(action => action.type === 'PING')
         .map(a =>
-            xs.periodic(10)
+            xs.periodic(10000)
                 .take(1)
                 .mapTo({ type: 'PONG' })
         )
@@ -69,11 +69,11 @@ describe('Redux cycle middleware', () => {
       { type: 'PING' }
     ])
 
-    setTimeout(() =>
-        expect(store.getState()).toEqual(expectedActions)
-        &&
-        done()
-    , 10)
+    expect(store.getState()).not.toMatchObject(expectedActions);
+    jest.runAllTimers();
+    expect(setInterval.mock.calls[0][1]).toBe(10000);
+    expect(store.getState()).toMatchObject(expectedActions);
+    done();
   })
 
   it('dispatches INCREMENT_ASYNC and INCREMENT_IF_ODD actions to check whether state updates correctly', (done) => {
@@ -119,17 +119,17 @@ describe('Redux cycle middleware', () => {
     })
 
     store.dispatch({ type: 'INCREMENT_ASYNC' })
-    expect(store.getState()).toEqual(1);
+    expect(store.getState()).toBe(1);
     store.dispatch({ type: 'INCREMENT_ASYNC' })
-    expect(store.getState()).toEqual(2);
+    expect(store.getState()).toBe(2);
     store.dispatch({ type: 'INCREMENT_ASYNC' })
-    expect(store.getState()).toEqual(3);
+    expect(store.getState()).toBe(3);
     store.dispatch({ type: 'INCREMENT_IF_ODD' })
-    expect(store.getState()).toEqual(4);
+    expect(store.getState()).toBe(4);
     store.dispatch({ type: 'INCREMENT_IF_ODD' })
-    expect(store.getState()).toEqual(4);
+    expect(store.getState()).toBe(4);
     store.dispatch({ type: 'INCREMENT_ASYNC' })
-    expect(store.getState()).toEqual(5);
+    expect(store.getState()).toBe(5);
 
     done();
 
