@@ -14,6 +14,7 @@
   "dependencies": {
     "@cycle/dom": "^14.1.0",
     "@cycle/http": "^11.2.0",
+    "@cycle/time": "^0.2.0",
     "@cycle/xstream-run": "^4.0.0",
     "history": "^2.1.2",
     "react": "^15.3.0",
