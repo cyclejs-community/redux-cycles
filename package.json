@@ -9,7 +9,7 @@
   "repository": "https://github.com/lmatteis/redux-cycle-middleware",
   "author": "Luca Matteis",
   "scripts": {
-    "test": "jest",
+    "test": "npm run build && jest",
     "build": "babel --presets es2015 src --out-dir dist",
     "prepublish": "npm run build"
   },
