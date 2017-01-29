@@ -1,51 +1,14 @@
 import assert from 'assert';
 import xs from 'xstream';
 import fromDiagram from 'xstream/extra/fromDiagram';
+import {mockTimeSource} from '@cycle/time';
 import * as ActionTypes from '../../ActionTypes';
 import * as actions from '../../actions';
 
 import { fetchReposByUser } from '../';
 
-function assertEqualStream(actual, expected, done) {
-  let calledComplete = 0;
-  let completeStore = {};
-
-  function complete (label, entries) {
-    calledComplete++;
-
-    completeStore[label] = entries;
-
-    if (calledComplete === 2) {
-      assert.deepEqual(completeStore['actual'], completeStore['expected']);
-      done()
-    }
-  }
-  const completeListener = (label) => {
-    const entries = [];
-
-    return {
-      next (ev) {
-        entries.push({type: 'next', value: ev});
-      },
-
-      complete () {
-        entries.push({type: 'complete'});
-
-        complete(label, entries)
-      },
-
-      error (error) {
-        entries.push({type: 'error', error});
-
-        complete(label, entries);
-      }
-    }
-  }
-  actual.addListener(completeListener('actual'))
-  expected.addListener(completeListener('expected'))
-}
-
 function assertSourcesSinks(sources, sinks, main, done) {
+  const Time = mockTimeSource();
   const _sources = Object.keys(sources)
     .reduce((_sources, sourceKey) => {
       const sourceObj = sources[sourceKey];
@@ -53,17 +16,16 @@ function assertSourcesSinks(sources, sinks, main, done) {
       const sourceOpts = sourceObj[diagram];
 
       let obj = {};
-      if (sourceOpts.values) {
-        obj = {
-          [sourceKey]: fromDiagram(diagram, sourceOpts)
-        }
-      } else {
-        // it's a function
-        let firstKey = Object.keys(sourceOpts)[0];
+      let firstKey = Object.keys(sourceOpts)[0];
+      if (typeof sourceOpts[firstKey] === 'function') {
         obj = {
           [sourceKey]: {
-            [firstKey]: () => fromDiagram(diagram, sourceOpts[firstKey]())
+            [firstKey]: () => Time.diagram(diagram, sourceOpts[firstKey]())
           }
+        }
+      } else {
+        obj = {
+          [sourceKey]: Time.diagram(diagram, sourceOpts)
         }
       }
       return Object.assign(_sources, obj);
@@ -75,13 +37,15 @@ function assertSourcesSinks(sources, sinks, main, done) {
       const diagram = Object.keys(sinkObj)[0];
       const sinkOpts = sinkObj[diagram];
 
-      return Object.assign(_sinks, { [sinkKey]: fromDiagram(diagram, sinkOpts) });
+      return Object.assign(_sinks, { [sinkKey]: Time.diagram(diagram, sinkOpts) });
     }, {});
 
   const _main = main(_sources);
 
   Object.keys(sinks)
-    .map(sinkKey => assertEqualStream(_main[sinkKey], _sinks[sinkKey], done));
+    .map(sinkKey => Time.assertEqual(_main[sinkKey], _sinks[sinkKey]));
+
+  Time.run(done);
 }
 
 describe('Cycles', function() {
@@ -90,37 +54,33 @@ describe('Cycles', function() {
       const user1 = 'lmatteis';
       const user2 = 'luca';
 
-      const actionSourcesOpts = {
-        values: {
-          a: actions.requestReposByUser(user1),
-          b: actions.requestReposByUser(user2)
-        }
+      const actionSource = {
+        a: actions.requestReposByUser(user1),
+        b: actions.requestReposByUser(user2)
       };
 
-      const httpSourcesOpts = {
+      const httpSource = {
         select: () => null
-      };
+      }
 
-      const httpSinksOpts = {
-        values: {
-          x: {
-            url: `https://api.github.com/users/${user1}/repos`,
-            category: 'users'
-          },
-          y: {
-            url: `https://api.github.com/users/${user2}/repos`,
-            category: 'users'
-          }
+      const httpSink = {
+        x: {
+          url: `https://api.github.com/users/${user1}/repos`,
+          category: 'users'
+        },
+        y: {
+          url: `https://api.github.com/users/${user2}/repos`,
+          category: 'users'
         }
       };
 
       // Asserts that the sources, trigger the provided sinks,
       // when executing the fetchReposByUser function
       assertSourcesSinks({
-        ACTION: { 'ab|': actionSourcesOpts },
-        HTTP:   { '--|': httpSourcesOpts }
+        ACTION: { 'ab|': actionSource },
+        HTTP:   { '--|': httpSource }
       }, {
-        HTTP:   { 'xy|': httpSinksOpts }
+        HTTP:   { 'xy|': httpSink }
       }, fetchReposByUser, done);
 
     });
@@ -131,31 +91,25 @@ describe('Cycles', function() {
 
       const response = { body: { foo: 'bar' } };
 
-      const actionSourcesOpts = {
-        values: {
-          a: actions.requestReposByUser(user1)
-        }
+      const actionSource = {
+        a: actions.requestReposByUser(user1)
       };
 
-      const httpSourcesOpts = {
+      const httpSource = {
         select: () => ({
-          values: {
-            r: xs.of(response)
-          }
+          r: xs.of(response)
         })
       };
 
-      const actionSinksOpts = {
-        values: {
-          a: actions.receiveUserRepos(user1, response.body)
-        }
+      const actionSink = {
+        a: actions.receiveUserRepos(user1, response.body)
       };
 
       assertSourcesSinks({
-        ACTION: { 'a|': actionSourcesOpts },
-        HTTP:   { 'r|': httpSourcesOpts }
+        ACTION: { 'a|': actionSource },
+        HTTP:   { 'r|': httpSource }
       }, {
-        ACTION: { 'a|': actionSinksOpts }
+        ACTION: { 'a|': actionSink }
       }, fetchReposByUser, done);
 
     });

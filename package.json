@@ -13,6 +13,9 @@
     "build": "babel --presets es2015 src --out-dir dist",
     "prepublish": "npm run build"
   },
+  "jest": {
+    "testPathIgnorePatterns": ["/example"]
+  },
   "license": "MIT",
   "devDependencies": {
     "@cycle/xstream-run": "^4.0.0",
