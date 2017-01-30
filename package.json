@@ -1,6 +1,6 @@
 {
   "name": "redux-cycle-middleware",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Bring functional reactive programming to Redux using Cycle.js",
   "main": "dist",
   "files": [
