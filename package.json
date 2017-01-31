@@ -1,5 +1,5 @@
 {
-  "name": "redux-cycle-middleware",
+  "name": "redux-cycles",
   "version": "0.2.1",
   "description": "Bring functional reactive programming to Redux using Cycle.js",
   "main": "dist",
@@ -7,7 +7,11 @@
     "dist"
   ],
   "repository": "https://github.com/lmatteis/redux-cycle-middleware",
-  "author": "Luca Matteis",
+  "contributors": [
+    "Luca Matteis",
+    "Nick Balestra",
+    "Gosha Arinich"
+  ],
   "scripts": {
     "test": "npm run build && jest",
     "build": "babel --presets es2015 src --out-dir dist",

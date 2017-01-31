@@ -1,16 +1,16 @@
-# Redux-cycle-middleware
+# Redux-cycles
 Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 
-[![Build Status](https://travis-ci.org/cyclejs-community/redux-cycle-middleware.svg?branch=master)](https://travis-ci.org/cyclejs-community/redux-cycle-middleware)
+[![Build Status](https://travis-ci.org/cyclejs-community/redux-cycles.svg?branch=master)](https://travis-ci.org/cyclejs-community/redux-cycles)
 
 ## Install
 
-`npm install --save redux-cycle-middleware`
+`npm install --save redux-cycles`
 
 Then use `createCycleMiddleware()` which takes as first argument your `main` Cycle.js function, and second argument the Cycle.js drivers you want to use:
 
 ```js
-import { createCycleMiddleware } from 'redux-cycle-middleware';
+import { createCycleMiddleware } from 'redux-cycles';
 
 function main(sources) {
   const pong$ = sources.ACTION
@@ -34,7 +34,7 @@ const store = createStore(
 
 Try out this [JS Bin](https://jsbin.com/govola/10/edit?js,output).
 
-See a real world example: [cycle autocomplete](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
+See a real world example: [cycle autocomplete](https://github.com/cyclejs-community/redux-cycles/blob/master/example/cycle/index.js).
 
 ## What is this?
 
@@ -76,7 +76,7 @@ This middleware intercepts Redux actions and allows us to handle them using Cycl
 
 ## Drivers
 
-Redux-cycle-middleware ships with two drivers:
+Redux-cycles ships with two drivers:
 
 * `ACTION`, which is a read-write driver, allowing to react to actions that have just happened, as well as to dispatch new actions.
 * `STATE`, which is a read-only driver that streams the current redux state. It's a reactive counterpart of the `yield select(state => state)` effect in Redux-saga.
@@ -103,12 +103,12 @@ Here's an example on [how the STATE driver works](https://jsbin.com/kijucaw/7/ed
 
 ## Utils
 
-Redux-cycle-middleware ships with a combineCycles util. As the name suggests, it allows you to take multiple cycle apps (main functions) and combine them into a single one.
+Redux-cycles ships with a combineCycles util. As the name suggests, it allows you to take multiple cycle apps (main functions) and combine them into a single one.
 
 ### Example
 
 ```javascript
-import { combineCycles } from 'redux-cycle-middleware';
+import { combineCycles } from 'redux-cycles';
 
 // import all your cycle apps (main functions) you intend to use with the middleware:
 import fetchReposByUser from './fetchReposByUser';
@@ -123,11 +123,11 @@ export default combineCycles(
 
 ```
 
-You can see it used in the provided [example](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/index.js).
+You can see it used in the provided [example](https://github.com/cyclejs-community/redux-cycles/blob/master/example/cycle/index.js).
 
 ## Testing
 
-Since your main Cycle functions are pure dataflow, you can test them quite easily by giving streams as input and expecting specific streams as outputs. Checkout [these example tests](https://github.com/lmatteis/redux-cycle-middleware/blob/master/example/cycle/test/test.js). Also checkout the [cyclejs/time](https://github.com/cyclejs/time) project, which should work perfectly with redux-cycle-middleware.
+Since your main Cycle functions are pure dataflow, you can test them quite easily by giving streams as input and expecting specific streams as outputs. Checkout [these example tests](https://github.com/cyclejs-community/redux-cycles/blob/master/example/cycle/test/test.js). Also checkout the [cyclejs/time](https://github.com/cyclejs/time) project, which should work perfectly with redux-cycles.
 
 ## Why not just use Cycle.js?
 
