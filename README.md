@@ -36,9 +36,67 @@ Try out this [JS Bin](https://jsbin.com/govola/10/edit?js,output).
 
 See a real world example: [cycle autocomplete](https://github.com/cyclejs-community/redux-cycles/blob/master/example/cycle/index.js).
 
-## What is this?
+## Why?
 
-Here's how Async is done using [redux-observable](https://github.com/redux-observable/redux-observable). The problem is that we still have side-effects in our epics (`ajax.getJSON`). This means that we're still writing imperative code:
+There already are several side-effects solutions in the Redux ecosystem:
+
+* [redux-thunk](https://github.com/gaearon/redux-thunk)
+* [redux-saga](https://github.com/redux-saga/redux-saga)
+* [redux-ship](https://clarus.github.io/redux-ship/)
+* [redux-observable](http://redux-observable.js.org)
+
+Why create yet another one?
+
+The intention with redux-cycles was not to worsen the "JavaScript fatigue".
+Rather it provides a solution that solves several problems attributable to the currently available libraries.
+
+* **Respond to actions as they happen, from the side.**
+
+  Redux-thunk forces you to put your logic directly into the action creator.
+  This means that all the logic caused by a particular action is located in one place... which doesn't do the readability a favor.
+  It also means cross-cutting concerns like analytics get spread out across many files and functions.
+
+  Redux-cycles, instead, joins redux-saga and redux-observable in allowing you to respond to actions reactively.
+
+* **Declarative side-effects.**
+
+  For several reasons: code clarity and testability.
+
+  With redux-thunk and redux-observable you just smash everything together.
+
+  Redux-saga does make testing easier to an extent, but side-effects are still ad-hoc.
+
+  Redux-cycles, powered by Cycle.js, introduces an abstraction for reaching into the real world in an explicit manner.
+
+* **Statically typable.**
+
+  Because static typing helps you catch several types of mistakes early on.
+  It also allows you to model data and relationships in your program upfront.
+
+  Redux-saga falls short in the typing department... but it's not its fault entirely.
+  The JS generator syntax is tricky to type, and even when you try to, you'll find that typing anything inside the `catch`/`finally` blocks will lead to unexpected behavior.
+
+  Observables, on the other hand, are easier to type.
+
+## What's this Cycle thing anyway?
+
+[Cycle.js](https://cycle.js.org) is an interesting and unusual way of represting real-world programs.
+
+The program is represented as a pure function, which takes in some *sources* about events in the real world (think a stream of Redux actions), does something with it, and returns *sinks*, aka streams with commands to be performed.
+
+Redux-cycles provides an `ACTION` source, which is a stream of Redux actions, and listens to the `ACTION` sink.
+
+Custom side-effects are handled similarly — by providing a different source and listening to a different sink.
+An example with HTTP requests will be shown later in this readme.
+
+Aside: while the Cycle.js website aims to sell you on Cycle.js for everything—including the view layer—you do *not* have to use Cycle like that.
+With Redux-cycles, you are effectively using Cycle only for side-effect management, leaving the view to React, and the state to Redux.
+
+## What does this look like?
+
+Here's how Async is done using [redux-observable](https://github.com/redux-observable/redux-observable).
+The problem is that we still have side-effects in our epics (`ajax.getJSON`).
+This means that we're still writing imperative code:
 
 ```js
 const fetchUserEpic = action$ =>
@@ -103,7 +161,7 @@ Here's an example on [how the STATE driver works](https://jsbin.com/kijucaw/7/ed
 
 ## Utils
 
-Redux-cycles ships with a combineCycles util. As the name suggests, it allows you to take multiple cycle apps (main functions) and combine them into a single one.
+Redux-cycles ships with a `combineCycles` util. As the name suggests, it allows you to take multiple cycle apps (main functions) and combine them into a single one.
 
 ### Example
 
