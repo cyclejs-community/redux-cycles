@@ -56,7 +56,7 @@ Rather it provides a solution that solves several problems attributable to the c
   This means that all the logic caused by a particular action is located in one place... which doesn't do the readability a favor.
   It also means cross-cutting concerns like analytics get spread out across many files and functions.
 
-  Redux-cycles, instead, joins redux-saga and redux-observable in allowing you to respond to actions reactively.
+  Redux-cycles, instead, joins redux-saga and redux-observable in allowing you to respond to any action without embedding all your logic inside an action creator.
 
 * **Declarative side-effects.**
 
