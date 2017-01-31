@@ -1,7 +1,7 @@
 import * as actions from '../actions';
 import * as ActionTypes from '../ActionTypes';
 
-import { combineCycles } from 'redux-cycle-middleware';
+import { combineCycles } from 'redux-cycles';
 import xs from 'xstream';
 
 export function fetchReposByUser(sources) {
