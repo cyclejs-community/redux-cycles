@@ -1,16 +1,22 @@
 {
   "name": "redux-cycles",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Bring functional reactive programming to Redux using Cycle.js",
   "main": "dist",
   "files": [
     "dist"
   ],
-  "repository": "https://github.com/lmatteis/redux-cycle-middleware",
+  "repository": "https://github.com/cyclejs-community/redux-cycles",
   "contributors": [
-    "Luca Matteis",
-    "Nick Balestra",
-    "Gosha Arinich"
+    {
+      "name": "Luca Matteis"
+    },
+    {
+      "name": "Nick Balestra"
+    },
+    {
+      "name": "Gosha Arinich"
+    }
   ],
   "scripts": {
     "test": "npm run build && jest",
