@@ -3,7 +3,7 @@ import { browserHistory } from 'react-router';
 import { routerMiddleware } from 'react-router-redux';
 import rootReducer from './reducers';
 import main from './cycle';
-import { createCycleMiddleware } from 'redux-cycle-middleware';
+import { createCycleMiddleware } from 'redux-cycles';
 import {makeHTTPDriver} from '@cycle/http';
 
 const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
