@@ -1,5 +1,9 @@
 # Redux-cycles
 
+<div align="center">
+  <img src="logo.png" alt="Redux + Cycle.js = Love" />
+</div>
+
 Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 
 [![Build Status](https://travis-ci.org/cyclejs-community/redux-cycles.svg?branch=master)](https://travis-ci.org/cyclejs-community/redux-cycles)
@@ -18,7 +22,7 @@ Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 * [Drivers](#drivers)
 * [Utils](#utils)
   * [`combineCycles`](#combinecycles)
-* [Testing](#testig)
+* [Testing](#testing)
 * [Why not just use Cycle.js?](#why-not-just-use-cyclejs)
   * What's the difference between "adding Redux to Cycle.js" and "adding Cycle.js to Redux"?
 
@@ -103,7 +107,7 @@ If you already know Redux-thunk, but find it limiting or clunky, Redux-cycles ca
 
 * Move business logic out of action creators, leaving them pure and simple.
 
-You don't necessarily need Redux-cycle if your goal is only that.
+You don't necessarily need Redux-cycles if your goal is only that.
 You might find Redux-saga to be easier to switch to.
 
 ### I already know Redux-saga
@@ -113,11 +117,11 @@ Redux-cycles can help you to:
 * Handle your side-effects declaratively.
 
   Side-effect handling in Redux-saga makes testing easier compared to thunks, but you're still ultimately doing glorified function calls.
-  The Cycle.js architecture pushes side-effect handling further to the edges of your application, leaving your "cycles" (or "epcis") operate on pure streams.
+  The Cycle.js architecture pushes side-effect handling further to the edges of your application, leaving your "cycles" operate on pure streams.
 
 * Type your business logic.
 
-  Most of your business logic lives in sagas... and they are hard to impossible to statically type.
+  Most of your business logic lives in sagas... and they are hard/impossible to statically type.
   Have you had silly bugs in your sagas that Flow could have caught?
   I sure had.
 
@@ -127,7 +131,7 @@ Redux-cycles appears to be similar to Redux-observable... which it is, due to em
 So why might you want to try Redux-cycles?
 
 In a word: easier side-effect handling.
-With Redux-observables your side-effectful code is scattered through all your epics, *directly*.
+With Redux-observable your side-effectful code is scattered through all your epics, *directly*.
 
 It's hard to test.
 The code is less legible.
@@ -149,7 +153,7 @@ A great example of a small category like that could be:
 The domain API layer often is not the easiest one to switch, so if you're thinking that... think of something smaller :)
 
 **Redux-saga** can still be valuable, even if using Redux-cycles.
-Certain sagas read crystall clear, sagas that orchestrate user flow.
+Certain sagas read crystal clear; sagas that orchestrate user flow.
 
 Like onboarding maybe: after the user signs up, and adds two todos, show a "keep going!" popup.
 
@@ -176,7 +180,7 @@ The program is represented as a pure function, which takes in some *sources* abo
 
 Redux-cycles provides an `ACTION` source, which is a stream of Redux actions, and listens to the `ACTION` sink.
 
-```
+```javascript
 function main(sources) {
   const pong$ = sources.ACTION
     .filter(action => action.type === 'PING')
