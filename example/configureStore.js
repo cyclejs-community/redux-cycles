@@ -5,8 +5,12 @@ import rootReducer from './reducers';
 import main from './cycle';
 import { createCycleMiddleware } from 'redux-cycles';
 import {makeHTTPDriver} from '@cycle/http';
+import {timeDriver} from '@cycle/time';
 
-const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
+const cycleMiddleware = createCycleMiddleware(main, {
+  Time: timeDriver,
+  HTTP: makeHTTPDriver()
+});
 
 export default function configureStore() {
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

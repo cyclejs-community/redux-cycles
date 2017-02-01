@@ -5,7 +5,7 @@ import {mockTimeSource} from '@cycle/time';
 import * as ActionTypes from '../../ActionTypes';
 import * as actions from '../../actions';
 
-import { fetchReposByUser } from '../';
+import { fetchReposByUser, searchUsers } from '../';
 
 function assertSourcesSinks(sources, sinks, main, done) {
   const Time = mockTimeSource();
@@ -16,18 +16,25 @@ function assertSourcesSinks(sources, sinks, main, done) {
       const sourceOpts = sourceObj[diagram];
 
       let obj = {};
-      let firstKey = Object.keys(sourceOpts)[0];
-      if (typeof sourceOpts[firstKey] === 'function') {
+      if (diagram === 'stream') {
         obj = {
-          [sourceKey]: {
-            [firstKey]: () => Time.diagram(diagram, sourceOpts[firstKey]())
-          }
+          [sourceKey]: sourceOpts
         }
       } else {
-        obj = {
-          [sourceKey]: Time.diagram(diagram, sourceOpts)
+        let firstKey = Object.keys(sourceOpts)[0];
+        if (typeof sourceOpts[firstKey] === 'function') {
+          obj = {
+            [sourceKey]: {
+              [firstKey]: () => Time.diagram(diagram, sourceOpts[firstKey]())
+            }
+          }
+        } else {
+          obj = {
+            [sourceKey]: Time.diagram(diagram, sourceOpts)
+          }
         }
       }
+
       return Object.assign(_sources, obj);
     }, {})
 
@@ -45,7 +52,10 @@ function assertSourcesSinks(sources, sinks, main, done) {
   Object.keys(sinks)
     .map(sinkKey => Time.assertEqual(_main[sinkKey], _sinks[sinkKey]));
 
-  Time.run(done);
+  Time.run(err => {
+    expect(err).toBeFalsy();
+    done();
+  });
 }
 
 describe('Cycles', function() {
@@ -114,4 +124,32 @@ describe('Cycles', function() {
 
     });
   });
+
+  // describe('searchUsers', () => {
+  //   it('should emit HTTP requests given ACTIONs, in an async fashion', (done) => {
+  //     const actionSource = {
+  //       a: actions.searchUsers('l'),
+  //       b: actions.searchUsers('lu'),
+  //       c: actions.searchUsers('luc')
+  //     };
+  //     const httpSource = {
+  //       select: () => null
+  //     }
+  //     const actionSink = {
+  //       a: {
+  //         url: `https://api.github.com/search/users?q=luc`,
+  //         category: 'query'
+  //       }
+  //     }
+  //
+  //
+  //     assertSourcesSinks({
+  //       ACTION: { '-a-b-c------|': actionSource },
+  //       HTTP:   { '-------|': httpSource },
+  //       Time:   { stream: mockTimeSource() }
+  //     }, {
+  //       HTTP:   { '--a----|': actionSink }
+  //     }, searchUsers, done);
+  //   })
+  // })
 });

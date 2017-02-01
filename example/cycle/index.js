@@ -28,13 +28,13 @@ export function fetchReposByUser(sources) {
   }
 }
 
-function searchUsers(sources) {
+export function searchUsers(sources) {
   const searchQuery$ = sources.ACTION
     .filter(action => action.type === ActionTypes.SEARCHED_USERS)
     .map(action => action.payload.query)
     .filter(q => !!q)
     .map(q =>
-      xs.periodic(800)
+      sources.Time.periodic(800)
         .take(1)
         .mapTo(q)
         .endWhen(
