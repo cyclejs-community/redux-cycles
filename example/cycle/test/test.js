@@ -7,8 +7,8 @@ import * as actions from '../../actions';
 
 import { fetchReposByUser, searchUsers } from '../';
 
-function assertSourcesSinks(sources, sinks, main, done) {
-  const Time = mockTimeSource();
+function assertSourcesSinks(sources, sinks, main, done, timeOpts = {}) {
+  const Time = mockTimeSource(timeOpts);
   const _sources = Object.keys(sources)
     .reduce((_sources, sourceKey) => {
       const sourceObj = sources[sourceKey];
@@ -16,22 +16,16 @@ function assertSourcesSinks(sources, sinks, main, done) {
       const sourceOpts = sourceObj[diagram];
 
       let obj = {};
-      if (diagram === 'stream') {
+      let firstKey = Object.keys(sourceOpts)[0];
+      if (typeof sourceOpts[firstKey] === 'function') {
         obj = {
-          [sourceKey]: sourceOpts
+          [sourceKey]: {
+            [firstKey]: () => Time.diagram(diagram, sourceOpts[firstKey]())
+          }
         }
       } else {
-        let firstKey = Object.keys(sourceOpts)[0];
-        if (typeof sourceOpts[firstKey] === 'function') {
-          obj = {
-            [sourceKey]: {
-              [firstKey]: () => Time.diagram(diagram, sourceOpts[firstKey]())
-            }
-          }
-        } else {
-          obj = {
-            [sourceKey]: Time.diagram(diagram, sourceOpts)
-          }
+        obj = {
+          [sourceKey]: Time.diagram(diagram, sourceOpts)
         }
       }
 
@@ -46,6 +40,9 @@ function assertSourcesSinks(sources, sinks, main, done) {
 
       return Object.assign(_sinks, { [sinkKey]: Time.diagram(diagram, sinkOpts) });
     }, {});
+
+  // always pass Time as a source
+  _sources.Time = Time;
 
   const _main = main(_sources);
 
@@ -125,31 +122,35 @@ describe('Cycles', function() {
     });
   });
 
-  // describe('searchUsers', () => {
-  //   it('should emit HTTP requests given ACTIONs, in an async fashion', (done) => {
-  //     const actionSource = {
-  //       a: actions.searchUsers('l'),
-  //       b: actions.searchUsers('lu'),
-  //       c: actions.searchUsers('luc')
-  //     };
-  //     const httpSource = {
-  //       select: () => null
-  //     }
-  //     const actionSink = {
-  //       a: {
-  //         url: `https://api.github.com/search/users?q=luc`,
-  //         category: 'query'
-  //       }
-  //     }
-  //
-  //
-  //     assertSourcesSinks({
-  //       ACTION: { '-a-b-c------|': actionSource },
-  //       HTTP:   { '-------|': httpSource },
-  //       Time:   { stream: mockTimeSource() }
-  //     }, {
-  //       HTTP:   { '--a----|': actionSink }
-  //     }, searchUsers, done);
-  //   })
-  // })
+  describe('searchUsers', () => {
+    it('should emit HTTP requests given many debounced ACTIONs, and should emit ACTION given HTTP response', (done) => {
+      const actionSource = {
+        a: actions.searchUsers('l'),
+        b: actions.searchUsers('lu'),
+        c: actions.searchUsers('luc')
+      };
+      const httpSource = {
+        select: () => ({
+          r: xs.of({ body: { items: ['foo'] } })
+        })
+      }
+      const httpSink = {
+        a: {
+          url: `https://api.github.com/search/users?q=luc`,
+          category: 'query'
+        }
+      }
+      const actionSink = {
+        r: actions.receiveUsers(['foo']),
+      }
+
+      assertSourcesSinks({
+        ACTION: { '-a-b-c----|': actionSource },
+        HTTP:   { '---r------|': httpSource },
+      }, {
+        HTTP:   { '---------a|': httpSink },
+        ACTION: { '---r------|': actionSink },
+      }, searchUsers, done, { interval: 200 });
+    })
+  })
 });
