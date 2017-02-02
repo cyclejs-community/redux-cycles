@@ -22,7 +22,7 @@ function main(sources) {
   }
 }
 
-const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
+const cycleMiddleware = createCycleMiddleware(main);
 
 const store = createStore(
   rootReducer,
@@ -159,6 +159,19 @@ function main(sources) {
 
 Here's an example on [how the STATE driver works](https://jsbin.com/kijucaw/7/edit?js,output).
 
+NOTE: If you want to use any other driver aside ACTION and STATE, make sure to have it installed and registered. You can do so at instantiation time, via the `createCycleMiddleware` API.
+For example, for the HTTP driver:
+
+```bash
+npm install @cycle/http
+```
+
+```javascript
+import { createCycleMiddleware } from 'redux-cycles';
+import { makeHTTPDriver } from '@cycle/http';
+
+const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
+```
 ## Utils
 
 Redux-cycles ships with a `combineCycles` util. As the name suggests, it allows you to take multiple cycle apps (main functions) and combine them into a single one.

@@ -1,7 +1,7 @@
 import {run} from '@cycle/xstream-run';
 import xs from 'xstream';
 
-export default function createCycleMiddleware(mainFn, drivers) {
+export default function createCycleMiddleware(mainFn, drivers = {}) {
   return store =>
     next => {
       let actionListener = null;
