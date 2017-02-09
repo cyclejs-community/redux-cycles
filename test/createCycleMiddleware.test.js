@@ -1,27 +1,34 @@
-import { createCycleMiddleware } from '../';
+import { createCycleMiddleware, makeStoreDriver } from '../';
 import { createStore, applyMiddleware } from 'redux';
 import xs from 'xstream';
+import {run} from '@cycle/xstream-run';
 jest.useFakeTimers();
 
 function initStore(main, drivers, reducer = null) {
   const rootReducer = reducer || ((state = [], action) => state.concat(action));
-  const cycleMiddleware = createCycleMiddleware(main, drivers);
+  const cycleMiddleware = createCycleMiddleware();
+
   const store = createStore(
     rootReducer,
     applyMiddleware(cycleMiddleware)
   );
+
+  run(main, {
+    STORE: makeStoreDriver(store)
+  });
+
   return store;
 }
 
 describe('Redux cycle middleware', () => {
   it('dispatches a PING to see whether the middleware dispatches a PONG', (done) => {
     function main(sources) {
-      const pong$ = sources.ACTION
-        .filter(action => action.type === 'PING')
+      const pong$ = sources.STORE
+        .filter(({ action }) => action.type === 'PING')
         .mapTo({ type: 'PONG' });
 
       return {
-        ACTION: pong$
+        STORE: pong$
       }
     }
 
@@ -41,8 +48,8 @@ describe('Redux cycle middleware', () => {
 
   it('dispatches a PING to see whether the middleware dispatches a PONG after 10 seconds', (done) => {
     function main(sources) {
-      const pong$ = sources.ACTION
-        .filter(action => action.type === 'PING')
+      const pong$ = sources.STORE
+        .filter(({ action }) => action.type === 'PING')
         .map(a =>
             xs.periodic(10000)
                 .take(1)
@@ -51,7 +58,7 @@ describe('Redux cycle middleware', () => {
         .flatten();
 
       return {
-        ACTION: pong$
+        STORE: pong$
       }
     }
 
@@ -78,32 +85,24 @@ describe('Redux cycle middleware', () => {
 
   it('dispatches INCREMENT_ASYNC and INCREMENT_IF_ODD actions to check whether state updates correctly', (done) => {
     function main(sources) {
-      const state$ = sources.STATE;
-      const isOdd$ = state$
-        .map(state => state % 2 === 1)
-        .take(1);
-
-      const incrementIfOdd$ = sources.ACTION
-        .filter(action => action.type === 'INCREMENT_IF_ODD')
-        .map(action =>
-          isOdd$
+      const incrementIfOdd$ = sources.STORE
+        .filter(({ action, state }) =>
+          action.type === 'INCREMENT_IF_ODD' && state % 2 === 1
         )
-        .flatten()
-        .filter(isOdd => isOdd)
         .mapTo({ type: 'INCREMENT' });
 
-      const increment$ = sources.ACTION
-        .filter(action => action.type === 'INCREMENT_ASYNC')
+      const increment$ = sources.STORE
+        .filter(({ action }) => action.type === 'INCREMENT_ASYNC')
         .mapTo({ type: 'INCREMENT' });
 
-      const decrement$ = sources.ACTION
-        .filter(action => action.type === 'DECREMENT_ASYNC')
+      const decrement$ = sources.STORE
+        .filter(({ action }) => action.type === 'DECREMENT_ASYNC')
         .mapTo({ type: 'DECREMENT' });
 
       const both$ = xs.merge(increment$, decrement$)
 
       return {
-        ACTION: xs.merge(both$, incrementIfOdd$)
+        STORE: xs.merge(both$, incrementIfOdd$)
       }
     }
 
