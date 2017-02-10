@@ -1,15 +1,24 @@
-import { createCycleMiddleware } from '../';
+import { reduxCycles } from '../';
 import { createStore, applyMiddleware } from 'redux';
 import xs from 'xstream';
+import {run} from '@cycle/run';
+import {run as rxjsRun} from '@cycle/rxjs-run';
 jest.useFakeTimers();
 
-function initStore(main, drivers, reducer = null) {
+function initStore(main, drivers, reducer = null, r = run) {
   const rootReducer = reducer || ((state = [], action) => state.concat(action));
-  const cycleMiddleware = createCycleMiddleware(main, drivers);
+
+  const { createCycleMiddleware, makeActionDriver, makeStateDriver } = reduxCycles();
   const store = createStore(
     rootReducer,
-    applyMiddleware(cycleMiddleware)
+    applyMiddleware(createCycleMiddleware())
   );
+
+  r(main, {
+    ACTION: makeActionDriver(),
+    STATE: makeStateDriver()
+  })
+
   return store;
 }
 
@@ -130,6 +139,33 @@ describe('Redux cycle middleware', () => {
     expect(store.getState()).toBe(4);
     store.dispatch({ type: 'INCREMENT_ASYNC' })
     expect(store.getState()).toBe(5);
+
+    done();
+
+  })
+
+  it('uses rxjs-run with Cycle Unified', (done) => {
+    function main(sources) {
+      const pong$ = sources.ACTION
+        .filter(action => action.type === 'PING')
+        .do(_ => _) // do() only exists in RxJS
+        .mapTo({ type: 'PONG' });
+
+      return {
+        ACTION: pong$
+      }
+    }
+
+    const store = initStore(main, {}, null, rxjsRun)
+
+    store.dispatch({ type: 'PING' })
+
+    const expectedActions = [
+      { type: '@@redux/INIT' },
+      { type: 'PING' },
+      { type: 'PONG' }
+    ]
+    expect(store.getState()).toMatchObject(expectedActions)
 
     done();
 

@@ -1,7 +1,7 @@
-import createCycleMiddleware from './createCycleMiddleware'
+import reduxCycles from './reduxCycles'
 import combineCycles from './combineCycles'
 
 export {
-  createCycleMiddleware,
+  reduxCycles,
   combineCycles
 }
