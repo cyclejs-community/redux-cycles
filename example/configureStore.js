@@ -4,15 +4,14 @@ import { routerMiddleware } from 'react-router-redux';
 import rootReducer from './reducers';
 import main from './cycle';
 import { createCycleMiddleware } from 'redux-cycles';
+import {run} from '@cycle/xstream-run';
 import {makeHTTPDriver} from '@cycle/http';
 import {timeDriver} from '@cycle/time';
 
-const cycleMiddleware = createCycleMiddleware(main, {
-  Time: timeDriver,
-  HTTP: makeHTTPDriver()
-});
-
 export default function configureStore() {
+  const cycleMiddleware = createCycleMiddleware();
+  const { makeActionDriver, makeStateDriver } = cycleMiddleware;
+
   const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
   const store = createStore(
     rootReducer,
@@ -23,5 +22,13 @@ export default function configureStore() {
       )
     )
   );
+
+  run(main, {
+    ACTION: makeActionDriver(),
+    STATE: makeStateDriver(),
+    Time: timeDriver,
+    HTTP: makeHTTPDriver(),
+  })
+  
   return store;
 }
