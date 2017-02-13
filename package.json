@@ -21,7 +21,7 @@
   "scripts": {
     "eslint": "eslint --fix src/ test/",
     "test": "npm run build && npm run eslint && jest",
-    "build": "babel --presets es2015 src --out-dir dist",
+    "build": "babel src --out-dir dist",
     "prepublish": "npm run build"
   },
   "jest": {
