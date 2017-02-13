@@ -30,9 +30,10 @@ Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 
 `npm install --save redux-cycles`
 
-Then use `createCycleMiddleware()` which takes as first argument your `main` Cycle.js function, and second argument the Cycle.js drivers you want to use:
+Then use `createCycleMiddleware()` which returns the redux middleware function, but also has two function properties attached to it; namely `makeActionDriver()` and `makeStateDriver()` which you can use accordingly when you call `Cycle.run` (which can be installed via `npm i -s @cycle/xstream-run`).
 
 ```js
+import { run } from '@cycle/xstream-run';
 import { createCycleMiddleware } from 'redux-cycles';
 
 function main(sources) {
@@ -45,17 +46,22 @@ function main(sources) {
   }
 }
 
-const cycleMiddleware = createCycleMiddleware(main);
+const cycleMiddleware = createCycleMiddleware();
+const { makeActionDriver } = cycleMiddleware;
 
 const store = createStore(
   rootReducer,
   applyMiddleware(cycleMiddleware)
 );
+
+run(main, {
+  ACTION: makeActionDriver()
+})
 ```
 
 ## Example
 
-Try out this [JS Bin](https://jsbin.com/govola/10/edit?js,output).
+Try out this [JS Bin](https://jsbin.com/bomugapuxi/2/edit?js,output).
 
 See a real world example: [cycle autocomplete](https://github.com/cyclejs-community/redux-cycles/blob/master/example/cycle/index.js).
 
@@ -242,8 +248,8 @@ This middleware intercepts Redux actions and allows us to handle them using Cycl
 
 Redux-cycles ships with two drivers:
 
-* `ACTION`, which is a read-write driver, allowing to react to actions that have just happened, as well as to dispatch new actions.
-* `STATE`, which is a read-only driver that streams the current redux state. It's a reactive counterpart of the `yield select(state => state)` effect in Redux-saga.
+* `makeActionDriver()`, which is a read-write driver, allowing to react to actions that have just happened, as well as to dispatch new actions.
+* `makeStateDriver()`, which is a read-only driver that streams the current redux state. It's a reactive counterpart of the `yield select(state => state)` effect in Redux-saga.
 
 ```javascript
 import sampleCombine from 'xstream/extra/sampleCombine'
@@ -263,21 +269,8 @@ function main(sources) {
 }
 ```
 
-Here's an example on [how the STATE driver works](https://jsbin.com/kijucaw/7/edit?js,output).
+Here's an example on [how the STATE driver works](https://jsbin.com/rohomaxuma/2/edit?js,output).
 
-NOTE: If you want to use any other driver aside ACTION and STATE, make sure to have it installed and registered. You can do so at instantiation time, via the `createCycleMiddleware` API.
-For example, for the HTTP driver:
-
-```bash
-npm install @cycle/http
-```
-
-```javascript
-import { createCycleMiddleware } from 'redux-cycles';
-import { makeHTTPDriver } from '@cycle/http';
-
-const cycleMiddleware = createCycleMiddleware(main, { HTTP: makeHTTPDriver() });
-```
 ## Utils
 
 ### `combineCycles`

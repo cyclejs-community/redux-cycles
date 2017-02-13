@@ -2,15 +2,24 @@
 import { createCycleMiddleware } from '../'
 import { createStore, applyMiddleware } from 'redux'
 import xs from 'xstream'
+import {run} from '@cycle/xstream-run'
 jest.useFakeTimers()
 
-function initStore(main, drivers, reducer = null) {
+function initStore(main, drivers, reducer = null, r = run) {
   const rootReducer = reducer || ((state = [], action) => state.concat(action))
-  const cycleMiddleware = createCycleMiddleware(main, drivers)
+
+  const cycleMiddleware = createCycleMiddleware()
+  const { makeActionDriver, makeStateDriver } = cycleMiddleware
   const store = createStore(
     rootReducer,
     applyMiddleware(cycleMiddleware)
   )
+
+  r(main, {
+    ACTION: makeActionDriver(),
+    STATE: makeStateDriver()
+  })
+
   return store
 }
 

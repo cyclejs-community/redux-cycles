@@ -1,6 +1,6 @@
 {
   "name": "redux-cycles",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "Bring functional reactive programming to Redux using Cycle.js",
   "main": "dist",
   "files": [
@@ -31,10 +31,10 @@
   },
   "license": "MIT",
   "dependencies": {
-    "@cycle/xstream-run": "^4.0.0",
     "xstream": "^9.0.0"
   },
   "devDependencies": {
+    "@cycle/xstream-run": "^4.0.0",
     "babel-cli": "^6.18.0",
     "babel-jest": "^18.0.0",
     "babel-preset-es2015": "^6.9.0",
