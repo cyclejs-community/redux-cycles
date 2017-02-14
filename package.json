@@ -21,7 +21,7 @@
   "scripts": {
     "eslint": "eslint --fix src/ test/",
     "test": "npm run build && npm run eslint && jest",
-    "build": "babel --presets es2015 src --out-dir dist",
+    "build": "babel src --out-dir dist",
     "prepublish": "npm run build"
   },
   "jest": {
@@ -30,6 +30,38 @@
     ]
   },
   "license": "MIT",
+  "babel": {
+    "presets": ["es2015"]
+  },
+  "eslintConfig": {
+    "env": {
+        "browser": true,
+        "es6": true,
+        "node": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "sourceType": "module"
+    },
+    "rules": {
+        "indent": [
+            "error",
+            2
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ],
+        "semi": [
+            "error",
+            "never"
+        ]
+    }
+  },
   "dependencies": {
     "xstream": "^9.0.0"
   },
