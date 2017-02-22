@@ -4,7 +4,7 @@ import { routerMiddleware } from 'react-router-redux';
 import rootReducer from './reducers';
 import main from './cycle';
 import { createCycleMiddleware } from 'redux-cycles';
-import {run} from '@cycle/xstream-run';
+import {run} from '@cycle/run';
 import {makeHTTPDriver} from '@cycle/http';
 import {timeDriver} from '@cycle/time';
 
@@ -29,6 +29,6 @@ export default function configureStore() {
     Time: timeDriver,
     HTTP: makeHTTPDriver(),
   })
-  
+
   return store;
 }

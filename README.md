@@ -30,10 +30,10 @@ Handle redux async actions using [Cycle.js](https://cycle.js.org/).
 
 `npm install --save redux-cycles`
 
-Then use `createCycleMiddleware()` which returns the redux middleware function, but also has two function properties attached to it; namely `makeActionDriver()` and `makeStateDriver()` which you can use accordingly when you call `Cycle.run` (which can be installed via `npm i -s @cycle/xstream-run`).
+Then use `createCycleMiddleware()` which returns the redux middleware function with two driver factories attached: `makeActionDriver()` and `makeStateDriver()`. Use them when you call the Cycle `run` function (can be installed via `npm install --save @cycle/run`).
 
 ```js
-import { run } from '@cycle/xstream-run';
+import { run } from '@cycle/run';
 import { createCycleMiddleware } from 'redux-cycles';
 
 function main(sources) {
@@ -58,6 +58,21 @@ run(main, {
   ACTION: makeActionDriver()
 })
 ```
+
+By default `@cycle/run` uses `xstream`. If you want to use another streaming library simply import it and use its `run` method instead.
+
+For RxJS:
+
+```js
+import { run } from '@cycle/rxjs-run';
+```
+
+For Most.js:
+
+```js
+import { run } from '@cycle/most-run';
+```
+
 
 ## Example
 
