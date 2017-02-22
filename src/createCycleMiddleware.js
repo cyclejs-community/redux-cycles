@@ -1,4 +1,5 @@
 import xs from 'xstream'
+import {adapt} from '@cycle/run/lib/adapt'
 
 export default function createCycleMiddleware () {
   let store = null
@@ -33,12 +34,12 @@ export default function createCycleMiddleware () {
         complete: () => {},
       })
 
-      return xs.create({
+      return adapt(xs.create({
         start: listener => {
           actionListener = listener
         },
         stop: () => {},
-      })
+      }))
     }
   }
 
@@ -46,7 +47,7 @@ export default function createCycleMiddleware () {
     const isSame = {}
     return function stateDriver() {
       const getCurrent = store.getState
-      return xs.create({
+      return adapt(xs.create({
         start: listener => {
           stateListener = listener
         },
@@ -62,7 +63,7 @@ export default function createCycleMiddleware () {
         return currState
       }, getCurrent)
       .map(state => state === getCurrent ? getCurrent() : state)
-      .filter(state => state !== isSame)
+      .filter(state => state !== isSame))
     }
   }
 

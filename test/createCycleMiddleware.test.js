@@ -1,8 +1,12 @@
 /* eslint-disable no-undef */
+/* eslint-disable no-console */
 import { createCycleMiddleware } from '../'
 import { createStore, applyMiddleware } from 'redux'
 import xs from 'xstream'
-import {run} from '@cycle/xstream-run'
+import {run} from '@cycle/run'
+import {run as rxjsRun} from '@cycle/rxjs-run'
+import {Observable} from 'rxjs/Rx'
+import {setAdapt} from '@cycle/run/lib/adapt'
 jest.useFakeTimers()
 
 function initStore(main, drivers, reducer = null, r = run) {
@@ -23,7 +27,9 @@ function initStore(main, drivers, reducer = null, r = run) {
   return store
 }
 
-describe('Redux cycle middleware', () => {
+describe('Redux cycle middleware xstream', () => {
+  beforeEach(() => setAdapt(stream => stream))
+
   it('dispatches a PING to see whether the middleware dispatches a PONG', (done) => {
     function main(sources) {
       const pong$ = sources.ACTION
@@ -54,9 +60,9 @@ describe('Redux cycle middleware', () => {
       const pong$ = sources.ACTION
         .filter(action => action.type === 'PING')
         .map(() =>
-            xs.periodic(10000)
-                .take(1)
-                .mapTo({ type: 'PONG' })
+          xs.periodic(10000)
+            .take(1)
+            .mapTo({ type: 'PONG' })
         )
         .flatten()
 
@@ -140,6 +146,37 @@ describe('Redux cycle middleware', () => {
     expect(store.getState()).toBe(4)
     store.dispatch({ type: 'INCREMENT_ASYNC' })
     expect(store.getState()).toBe(5)
+
+    done()
+
+  })
+})
+
+describe('Redux cycle middleware RxJS', () => {
+  beforeEach(() => setAdapt(stream => Observable.from(stream)))
+
+  it('uses rxjs-run with Cycle Unified', (done) => {
+    function main(sources) {
+      const pong$ = sources.ACTION
+        .filter(action => action.type === 'PING')
+        .do(_ => _) // do() only exists in RxJS
+        .mapTo({ type: 'PONG' })
+
+      return {
+        ACTION: pong$
+      }
+    }
+
+    const store = initStore(main, {}, null, rxjsRun)
+
+    store.dispatch({ type: 'PING' })
+
+    const expectedActions = [
+      { type: '@@redux/INIT' },
+      { type: 'PING' },
+      { type: 'PONG' }
+    ]
+    expect(store.getState()).toMatchObject(expectedActions)
 
     done()
 
