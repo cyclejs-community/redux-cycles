@@ -12,7 +12,7 @@ export default function combineCycles(...mains) {
       .reduce((combinedSinks, driver) => {
         const driverSinks = sinks
           .filter(sink => sink[driver])
-          .map(sink => sink[driver])
+          .map(sink => xs.from(sink[driver]))
 
         combinedSinks[driver] = xs.merge(...driverSinks)
         return combinedSinks
