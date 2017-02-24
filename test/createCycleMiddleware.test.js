@@ -1,6 +1,6 @@
 /* eslint-disable no-undef */
 /* eslint-disable no-console */
-import { createCycleMiddleware } from '../'
+import { createCycleMiddleware, combineCycles } from '../'
 import { createStore, applyMiddleware } from 'redux'
 import xs from 'xstream'
 import {run} from '@cycle/run'
@@ -46,7 +46,7 @@ describe('Redux cycle middleware xstream', () => {
       { type: 'PING' },
       { type: 'PONG' }
     ]
-    const store = initStore(main, {})
+    const store = initStore(combineCycles(main), {})
 
     store.dispatch({ type: 'PING' })
 
@@ -167,7 +167,7 @@ describe('Redux cycle middleware RxJS', () => {
       }
     }
 
-    const store = initStore(main, {}, null, rxjsRun)
+    const store = initStore(combineCycles(main), {}, null, rxjsRun)
 
     store.dispatch({ type: 'PING' })
 
