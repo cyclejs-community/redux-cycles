@@ -1,6 +1,6 @@
 {
   "name": "redux-cycles",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Bring functional reactive programming to Redux using Cycle.js",
   "main": "dist",
   "files": [
