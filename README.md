@@ -184,7 +184,7 @@ Life's not all-or-nothing, you can definitely use Redux-cycles and Redux-saga si
 
 ## What's this Cycle thing anyway?
 
-[Cycle.js](https://cycle.js.org) is an interesting and unusual way of represting real-world programs.
+[Cycle.js](https://cycle.js.org) is an interesting and unusual way of representing real-world programs.
 
 The program is represented as a pure function, which takes in some *sources* about events in the real world (think a stream of Redux actions), does something with it, and returns *sinks*, aka streams with commands to be performed.
 
